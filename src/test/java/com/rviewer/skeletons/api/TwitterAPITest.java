@@ -1,5 +1,7 @@
 package com.rviewer.skeletons.api;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -78,5 +80,32 @@ public class TwitterAPITest {
 		mockServer.enqueue(new MockResponse()
 				  .setResponseCode(400));
 		assertThrows(APIClientException.class, () -> twitterClient.getUserIdByUsername("twitter%"));
+	}
+	
+	@Test
+	public void mutualFollowTest() {
+		String response = "{\"relationship\":{\"source\":{\"id\":2157770540,\"id_str\":\"2157770540\",\"screen_name\":\"nachhoreyes\",\"following\":true,\"followed_by\":true,\"live_following\":false,\"following_received\":null,\"following_requested\":null,\"notifications_enabled\":null,\"can_dm\":true,\"blocking\":null,\"blocked_by\":null,\"muting\":null,\"want_retweets\":null,\"all_replies\":null,\"marked_spam\":null},\"target\":{\"id\":1384172373302157323,\"id_str\":\"1384172373302157323\",\"screen_name\":\"TestersMonkey\",\"following\":true,\"followed_by\":true,\"following_received\":null,\"following_requested\":null}}}";
+		mockServer.enqueue(new MockResponse()
+			      .setBody(response)
+			      .addHeader("Content-Type", "application/json"));
+		assertTrue(twitterClient.mutualFollowers("2157770540", "1384172373302157323"));
+	}
+	
+	@Test
+	public void notMutualFollowTest() {
+		String response = "{\"relationship\":{\"source\":{\"id\":2157770540,\"id_str\":\"2157770540\",\"screen_name\":\"nachhoreyes\",\"following\":true,\"followed_by\":false,\"live_following\":false,\"following_received\":null,\"following_requested\":null,\"notifications_enabled\":null,\"can_dm\":true,\"blocking\":null,\"blocked_by\":null,\"muting\":null,\"want_retweets\":null,\"all_replies\":null,\"marked_spam\":null},\"target\":{\"id\":57440969,\"id_str\":\"57440969\",\"screen_name\":\"sysarmy\",\"following\":false,\"followed_by\":true,\"following_received\":null,\"following_requested\":null}}}";
+		mockServer.enqueue(new MockResponse()
+			      .setBody(response)
+			      .addHeader("Content-Type", "application/json"));
+		assertFalse(twitterClient.mutualFollowers("2157770540", "57440969"));
+	}
+	
+	@Test
+	public void notFollowTest() {
+		String response = "{\"relationship\":{\"source\":{\"id\":2157770540,\"id_str\":\"2157770540\",\"screen_name\":\"nachhoreyes\",\"following\":false,\"followed_by\":false,\"live_following\":false,\"following_received\":null,\"following_requested\":null,\"notifications_enabled\":null,\"can_dm\":false,\"blocking\":null,\"blocked_by\":null,\"muting\":null,\"want_retweets\":null,\"all_replies\":null,\"marked_spam\":null},\"target\":{\"id\":3315061,\"id_str\":\"3315061\",\"screen_name\":\"asdasd\",\"following\":false,\"followed_by\":false,\"following_received\":null,\"following_requested\":null}}}";
+		mockServer.enqueue(new MockResponse()
+			      .setBody(response)
+			      .addHeader("Content-Type", "application/json"));
+		assertFalse(twitterClient.mutualFollowers("2157770540", "3315061"));
 	}
 }
