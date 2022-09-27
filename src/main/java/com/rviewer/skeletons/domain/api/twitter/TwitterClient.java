@@ -42,7 +42,7 @@ public class TwitterClient implements ITwitterClient {
 			throw new APIClientException("Twitter error, user not retrieved");
 		}
 		
-		if(user.isUserDoesNotExists()) {
+		if(user.isHasErrors()) {
 			throw new TwitterUserNotFoundException(username);
 		}
 		

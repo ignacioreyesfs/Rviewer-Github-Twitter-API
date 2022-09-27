@@ -9,20 +9,16 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class TwitterUser {
+	@JsonProperty("id_str")
 	private String id;
+	@JsonProperty("name")
 	private String name;
+	@JsonProperty("screen_name")
 	private String username;
-	private boolean userDoesNotExists;
-	
-	@JsonProperty("data")
-	private void unpackData(JsonNode data) {
-		this.id = data.get("id").textValue();
-		this.name = data.get("name").textValue();
-		this.username = data.get("username").textValue();
-	}
+	private boolean hasErrors;
 	
 	@JsonProperty("errors")
 	private void unpackErrors(JsonNode errors) {
-		this.userDoesNotExists = true;
+		this.hasErrors = true;
 	}
 }
