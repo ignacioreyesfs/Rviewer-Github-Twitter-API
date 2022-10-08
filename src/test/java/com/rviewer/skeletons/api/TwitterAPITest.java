@@ -19,7 +19,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.rviewer.skeletons.domain.api.APIClientException;
 import com.rviewer.skeletons.domain.api.twitter.ITwitterClient;
 import com.rviewer.skeletons.domain.api.twitter.TwitterClient;
 import com.rviewer.skeletons.domain.api.twitter.TwitterUserNotFoundException;
@@ -79,7 +78,7 @@ public class TwitterAPITest {
 	public void getBadFormatUserTest() {
 		mockServer.enqueue(new MockResponse()
 				  .setResponseCode(400));
-		assertThrows(APIClientException.class, () -> twitterClient.getUserIdByUsername("twitter%"));
+		assertThrows(TwitterUserNotFoundException.class, () -> twitterClient.getUserIdByUsername("twitter%"));
 	}
 	
 	@Test
