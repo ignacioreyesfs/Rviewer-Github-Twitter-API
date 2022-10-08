@@ -25,4 +25,13 @@ public class WebClientConfig {
 				.defaultHeader(HttpHeaders.ACCEPT, "application/json")
 				.build();
 	}
+	
+	@Bean(name="github")
+	public WebClient githubWebClient() {
+		return WebClient.builder()
+				.baseUrl(env.getProperty("github.url.base"))
+				.defaultHeader(HttpHeaders.AUTHORIZATION, env.getProperty("github.auth"))
+				.defaultHeader(HttpHeaders.ACCEPT, "application/json")
+				.build();
+	}
 }
