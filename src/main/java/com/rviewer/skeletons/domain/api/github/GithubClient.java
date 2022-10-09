@@ -42,7 +42,7 @@ public class GithubClient implements IGithubClient{
 			throw new LimitExceededException();
 		}
 		
-		log.info("userExists status code: " + res.getStatusCodeValue());
+		log.info(String.format("%s userExists status code: %d", username, res.getStatusCodeValue()));
 		
 		return res.getStatusCode().equals(HttpStatus.OK);
 	}
