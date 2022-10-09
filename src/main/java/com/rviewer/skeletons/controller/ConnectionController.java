@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.rviewer.skeletons.controller.dto.ConnectionErrorDTO;
 import com.rviewer.skeletons.controller.dto.RealtimeConnectionDTO;
 import com.rviewer.skeletons.domain.UsersConnection;
+import com.rviewer.skeletons.exceptions.APIError;
 import com.rviewer.skeletons.mapper.UsersConnectionMapper;
 import com.rviewer.skeletons.service.ConnectionService;
 
@@ -26,7 +26,7 @@ public class ConnectionController {
 	private UsersConnectionMapper mapper;
 	
 	@GetMapping("/connected/realtime/{dev1}/{dev2}")
-	public ResponseEntity<Object> getRealtimeConnection(@PathVariable String dev1,
+	public ResponseEntity<RealtimeConnectionDTO> getRealtimeConnection(@PathVariable String dev1,
 			@PathVariable String dev2) {
 		RealtimeConnectionDTO realtime;
 		HttpStatus status;
@@ -34,7 +34,7 @@ public class ConnectionController {
 		List<String> nonExistents = getNonExistentUsers(dev1, dev2);
 		
 		if(!nonExistents.isEmpty()) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ConnectionErrorDTO(nonExistents));
+			throw new InvalidUsersException(APIError.INVALID_USER, nonExistents);
 		}
 		
 		usersConnection = connectionService.getConnectionBetween(dev1, dev2);
