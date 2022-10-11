@@ -1,14 +1,18 @@
 package com.rviewer.skeletons.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.rviewer.skeletons.dao.ConnectionRepository;
 import com.rviewer.skeletons.domain.UsersConnection;
 import com.rviewer.skeletons.domain.api.github.IGithubClient;
 import com.rviewer.skeletons.domain.api.github.Organization;
 import com.rviewer.skeletons.domain.api.twitter.ITwitterClient;
 import com.rviewer.skeletons.domain.api.twitter.TwitterUserNotFoundException;
+import com.rviewer.skeletons.mapper.UsersConnectionMapper;
+import com.rviewer.skeletons.service.dto.RegisterDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
@@ -19,6 +23,8 @@ import lombok.extern.java.Log;
 public class ConnectionService {
 	private IGithubClient github;
 	private ITwitterClient twitter;
+	private ConnectionRepository connectionRepo;
+	private UsersConnectionMapper mapper;
 	
 	public boolean githubUserExists(String username) {
 		return github.userExists(username);
@@ -38,6 +44,8 @@ public class ConnectionService {
 		UsersConnection userConnection = new UsersConnection(username1, username2);
 		String twitterId1;
 		String twitterId2;
+		
+		userConnection.setRegisteredAt(LocalDateTime.now());
 		
 		try {
 			twitterId1 = twitter.getUserIdByUsername(username1);
@@ -63,5 +71,16 @@ public class ConnectionService {
 		List<Organization> orgs2 = github.findOrganizationsByUsername(username2);
 		
 		return orgs1.stream().filter(orgs2::contains).toList();
+	}
+
+	public void save(UsersConnection usersConnection) {
+		log.info("saved");
+		connectionRepo.save(usersConnection);
+	}
+
+	public List<RegisterDTO> getRegistersOf(String dev1, String dev2) {
+		return connectionRepo.findByUsername1AndUsername2OrderByRegisteredAtDesc(dev1, dev2).stream()
+				.map(mapper::toRegisterDTO)
+				.toList();
 	}
 }

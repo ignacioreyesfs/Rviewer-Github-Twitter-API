@@ -14,11 +14,14 @@ import com.rviewer.skeletons.domain.UsersConnection;
 import com.rviewer.skeletons.exceptions.APIError;
 import com.rviewer.skeletons.mapper.UsersConnectionMapper;
 import com.rviewer.skeletons.service.ConnectionService;
+import com.rviewer.skeletons.service.dto.RegisterDTO;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 
 @AllArgsConstructor
 @RestController
+@Log
 public class ConnectionController {
 	private final String INVALID_GITHUB_USER = "%s is not a valid user in github";
 	private final String INVALID_TWITTER_USER = "%s is not a valid user in twitter";
@@ -42,7 +45,21 @@ public class ConnectionController {
 				.toRealtimeConnectionDTO(usersConnection);
 		status = realtime.isConnected()? HttpStatus.OK: HttpStatus.NOT_FOUND;
 		
+		connectionService.save(usersConnection);
+		
 		return ResponseEntity.status(status).body(realtime);
+	}
+	
+	@GetMapping("/connected/register/{dev1}/{dev2}")
+	public ResponseEntity<List<RegisterDTO>> getRegisterConnections(@PathVariable String dev1,
+			@PathVariable String dev2){
+		List<RegisterDTO> registers = connectionService.getRegistersOf(dev1, dev2);
+		log.info("registers: " + registers.size());
+		if(registers.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		return ResponseEntity.ok(registers);
 	}
 	
 	private List<String> getNonExistentUsers(String user1, String user2){
