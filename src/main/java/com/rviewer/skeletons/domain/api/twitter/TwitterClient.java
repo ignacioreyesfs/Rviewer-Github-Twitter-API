@@ -33,7 +33,8 @@ public class TwitterClient implements ITwitterClient {
 					.queryParam("screen_name", username)
 					.build())
 			.retrieve()
-			.onStatus(status -> status.equals(HttpStatus.BAD_REQUEST) || status.equals(HttpStatus.NOT_FOUND),
+			.onStatus(status -> status.equals(HttpStatus.BAD_REQUEST) || status.equals(HttpStatus.NOT_FOUND)
+					|| status.equals(HttpStatus.FORBIDDEN),
 					err -> Mono.error(new TwitterUserNotFoundException(username)))
 			.onStatus(HttpStatus::isError, error -> {
 				return Mono.error(() -> new APIClientException(
